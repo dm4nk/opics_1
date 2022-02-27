@@ -1,6 +1,7 @@
 package com.dm4nk.opics.model;
 
 import com.vm.jcomplex.Complex;
+import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,9 +19,12 @@ public class Model {
     private static final double h = (b-a)/(double)n;
     private static final double l = (q-p)/(double)m;
 
-    public final List<Double> x_k = new ArrayList<>();
+    @Getter
+    private final List<Double> x_k = new ArrayList<>();
+    @Getter
     private final List<Complex> f_k = new ArrayList<>();
-    public final List<Double> ksi_k = new ArrayList<>();
+    @Getter
+    private final List<Double> ksi_k = new ArrayList<>();
 
     public Complex f(double x){
         return new Complex(Math.cos(x/10.), Math.sin(x/10.));
@@ -61,6 +65,8 @@ public class Model {
         for(double l : ksi_k){
             res.add(F(l));
         }
+
+        if(res.size() != ksi_k.size()) throw new RuntimeException("SIZE! KSI");
 
         return res;
     }

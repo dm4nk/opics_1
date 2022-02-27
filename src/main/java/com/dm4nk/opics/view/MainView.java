@@ -3,6 +3,7 @@ package com.dm4nk.opics.view;
 import com.dm4nk.opics.model.Model;
 import com.vaadin.flow.component.charts.Chart;
 import com.vaadin.flow.component.charts.model.*;
+import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
 import com.vm.jcomplex.Complex;
@@ -23,38 +24,39 @@ public class MainView extends VerticalLayout {
     public MainView() {
         Model model = new Model();
         List<Complex> resul = model.result();
-        List<Complex> resultForKsi = model.resultForKsi(1);
+        //List<Complex> resultForKsi = model.resultForKsi(1);
 
-        DataSeries ksi_real = new DataSeries();
+        addGraph(model.getX_k(), model.getF_k(), "Function");
 
-        int i = 0;
-        for(Complex c : resul){
-            ksi_real.add(new DataSeriesItem(model.ksi_k.get(i++) ,c.getArgument()));
+        addGraph(model.getKsi_k(), resul, "Function after transformation");
+    }
+
+    private void addGraph(List<Double> doubleList, List<Complex> complexList, String title) {
+        if(doubleList.size() != complexList.size()) throw new RuntimeException("SIZE!!!!!!!");
+
+        Chart chart = new Chart();
+        Configuration real = chart.getConfiguration();
+        Configuration imaginary = chart.getConfiguration();
+
+        DataSeries phase = new DataSeries();
+        DataSeries amplitude = new DataSeries();
+
+        for(int i = 0; i < doubleList.size(); ++i){
+            phase.add(new DataSeriesItem(
+                    doubleList.get(i),
+                    complexList.get(i).getArgument()
+            ));
+
+            amplitude.add(new DataSeriesItem(
+                    doubleList.get(i),
+                    complexList.get(i).abs()
+            ));
         }
 
-        conf1.addSeries(ksi_real);
-
-        /////
-
-        DataSeries ksi_im = new DataSeries();
-
-        int j = 0;
-        for(Complex c : resul){
-            ksi_im.add(new DataSeriesItem(model.ksi_k.get(j++) ,c.getImaginary()));
-        }
-
-        conf2.addSeries(ksi_im);
-
-        //////
-
-        DataSeries ksi = new DataSeries();
-        
-        for(Complex c : resultForKsi){
-            ksi.add(new DataSeriesItem(c.getArgument() ,c.getImaginary()));
-        }
-
-        conf3.addSeries(ksi_im);
-
-        add(chart1, chart3);
+        phase.setName("Phase");
+        amplitude.setName("Amplitude");
+        real.addSeries(phase);
+        imaginary.addSeries(amplitude);
+        add(new H2(title), chart);
     }
 }
